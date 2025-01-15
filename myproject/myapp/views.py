@@ -4,8 +4,10 @@ from rest_framework import status, generics
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
-# si los datos son validos se guardaran en el mysql y si no de dara error
+from django.utils import timezone
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, AttendanceSerializer
+from .models import Attendance
+
 class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -13,7 +15,7 @@ class RegisterView(APIView):
             serializer.save()
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-# esto es Si la autenticación es exitosa, se generan tokens de acceso y de refresco usando RefreshToken.
+
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -29,7 +31,17 @@ class LoginView(APIView):
                 }, status=status.HTTP_200_OK)
             return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-# proporcionar endpoints de listado y creación de usuarios.
+
 class UserListCreate(generics.ListCreateAPIView):
-    queryset = User.objects.all() # define los datos del usuario 
+    queryset = User.objects.all()
     serializer_class = UserSerializer
+
+class AttendanceView(APIView):
+    def post(self, request):
+        user = request.user
+        current_time = timezone.now()
+        
+        attendance = Attendance.objects.create(user=user, date=current_time.date(), time=current_time.time())
+        
+        serializer = AttendanceSerializer(attendance)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
