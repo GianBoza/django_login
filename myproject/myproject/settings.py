@@ -13,7 +13,7 @@ SECRET_KEY = 'your-secret-key'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2']  # Add your allowed hosts here
+ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2']  # Rutas para poder sincronizar con nuestro android 
 
 # Application definition
 
@@ -25,8 +25,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',  # Para manejar el blacklist de tokens
     'corsheaders',
-    'myapp',  # Ahora puedes añadirla aquí
+    'myapp',
 ]
 
 MIDDLEWARE = [
